@@ -19,7 +19,7 @@ steps:
     title: 'Calculate latest version'
     image: alpine:3.8
     commands:
-        - cf_export VERSION=$(VERSION)
+        - cf_export VERSION=$(cat VERSION)
     when:
       steps:
       - name: main_clone
