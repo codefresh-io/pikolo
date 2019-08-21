@@ -1,0 +1,10 @@
+version: '1.0'
+steps:
+  main_clone:
+    type: git-clone
+    repo: codefresh-io/pikolo
+    git: cf_github
+  test:
+    image: golang
+    commnads:
+    - make test
