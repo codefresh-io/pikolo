@@ -1,0 +1,3 @@
+steps:
+  step_1:
+    image: {{ .Values.image }}

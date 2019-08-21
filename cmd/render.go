@@ -34,15 +34,28 @@ var renderCmd = &cobra.Command{
 		for _, valuePath := range renderCmdOptions.values {
 			var file *os.File
 			var err error
+			var valueReader io.Reader
 			values := strings.Split(valuePath, "=")
 			if len(values) == 1 {
 				file, err = os.Open(values[0])
 				dieOnError(err, log)
-				valueReaders[renderCmdOptions.rootContext] = file
+				if strings.HasSuffix(values[0], ".json") {
+					valueReader, err = jsonToYaml(file)
+					dieOnError(err, log)
+				} else {
+					valueReader = file
+				}
+				valueReaders[renderCmdOptions.rootContext] = valueReader
 			} else {
 				file, err = os.Open(values[1])
 				dieOnError(err, log)
-				valueReaders[values[0]] = file
+				if strings.HasSuffix(values[1], ".json") {
+					valueReader, err = jsonToYaml(file)
+					dieOnError(err, log)
+				} else {
+					valueReader = file
+				}
+				valueReaders[values[0]] = valueReader
 			}
 			defer file.Close()
 		}
