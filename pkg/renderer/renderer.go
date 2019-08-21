@@ -9,6 +9,7 @@ import (
 
 	"github.com/ghodss/yaml"
 	"github.com/hairyhenderson/gomplate"
+	"github.com/imdario/mergo"
 )
 
 type (
@@ -18,7 +19,7 @@ type (
 
 	Options struct {
 		TemplateReaders map[string]io.Reader
-		ValueReaders    map[string]io.Reader
+		ValueReaders    map[string][]io.Reader
 		RootNamespace   string
 		LeftDelim       string
 		RightDelim      string
@@ -29,7 +30,7 @@ type (
 
 	renderer struct {
 		templateReaders map[string]io.Reader
-		valueReaders    map[string]io.Reader
+		valueReaders    map[string][]io.Reader
 		leftDelim       string
 		rightDelim      string
 		name            string
@@ -59,15 +60,19 @@ func (r *renderer) Render() (*bytes.Buffer, error) {
 		content = append(content, string(res))
 	}
 
-	for name, reader := range r.valueReaders {
+	for name, readers := range r.valueReaders {
 		vals := Values{}
-		res, err := ioutil.ReadAll(reader)
-		if err != nil {
-			return nil, err
-		}
-		err = yaml.Unmarshal([]byte(string(res)), &vals)
-		if err != nil {
-			return nil, err
+		for _, reader := range readers {
+			v := Values{}
+			res, err := ioutil.ReadAll(reader)
+			if err != nil {
+				return nil, err
+			}
+			err = yaml.Unmarshal([]byte(string(res)), &v)
+			if err != nil {
+				return nil, err
+			}
+			mergo.Merge(&vals, v)
 		}
 		root[name] = vals
 

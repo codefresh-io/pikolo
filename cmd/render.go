@@ -25,7 +25,7 @@ var renderCmd = &cobra.Command{
 	Use: "render",
 	Run: func(cmd *cobra.Command, args []string) {
 		templateReaders := make(map[string]io.Reader)
-		valueReaders := make(map[string]io.Reader)
+		valueReaders := make(map[string][]io.Reader)
 		log := logger.New(nil)
 		if len(renderCmdOptions.templates) == 0 {
 			dieOnError(fmt.Errorf("No tempalte given"), log)
@@ -51,7 +51,11 @@ var renderCmd = &cobra.Command{
 				} else {
 					valueReader = file
 				}
-				valueReaders[renderCmdOptions.rootContext] = valueReader
+				if _, ok := valueReaders[renderCmdOptions.rootContext]; !ok {
+					valueReaders[renderCmdOptions.rootContext] = []io.Reader{valueReader}
+				} else {
+					valueReaders[renderCmdOptions.rootContext] = append(valueReaders[renderCmdOptions.rootContext], valueReader)
+				}
 			} else {
 				file, err = os.Open(values[1])
 				dieOnError(err, log)
@@ -61,7 +65,11 @@ var renderCmd = &cobra.Command{
 				} else {
 					valueReader = file
 				}
-				valueReaders[values[0]] = valueReader
+				if _, ok := valueReaders[values[0]]; !ok {
+					valueReaders[values[0]] = []io.Reader{valueReader}
+				} else {
+					valueReaders[values[0]] = append(valueReaders[values[0]], valueReader)
+				}
 			}
 			defer file.Close()
 		}
@@ -84,6 +92,6 @@ func init() {
 	renderCmd.Flags().StringArrayVar(&renderCmdOptions.templates, "template", []string{}, "Path to template file")
 	renderCmd.Flags().StringArrayVar(&renderCmdOptions.values, "value", []string{}, "Path to value file")
 	renderCmd.Flags().StringVar(&renderCmdOptions.rootContext, "root-namespace", "Values", "Name of the root namespace (default: Values)")
-	renderCmd.Flags().StringVar(&renderCmdOptions.leftDelim, "left-delim", "<<", "Left delimiter (default: <<)")
-	renderCmd.Flags().StringVar(&renderCmdOptions.rightDelim, "right-delim", ">>", "Right delimiter (default: >>)")
+	renderCmd.Flags().StringVar(&renderCmdOptions.leftDelim, "left-delim", "{{", "Left delimiter (default: <<)")
+	renderCmd.Flags().StringVar(&renderCmdOptions.rightDelim, "right-delim", "}}", "Right delimiter (default: >>)")
 }
