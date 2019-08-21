@@ -26,7 +26,7 @@ func Test_renderer_Render(t *testing.T) {
 		{
 			templateReaders: []io.Reader{strings.NewReader("{{ .Values.key }}\n")},
 			valueReaders: map[string]io.Reader{
-				"Values": strings.NewReader("key: value\n"),
+				"Values": strings.NewReader("key: value"),
 			},
 			name:    "Render",
 			wantErr: false,
