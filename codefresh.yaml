@@ -92,16 +92,16 @@ steps:
 
 
   push_cli_image:
-    title: "Push image with venona cli"
+    title: "Push image"
     stage: Push & Release
     type: push
-    candidate: ${{build_cli_image}}
+    candidate: ${{build}}
     tags:
     - latest
     - ${{VERSION}}
     registry: "dockerhub"
     when:
       steps:
-        - name: build_cli_image
+        - name: build
           on:
           - success
