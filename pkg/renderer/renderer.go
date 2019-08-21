@@ -2,7 +2,6 @@ package renderer
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"strings"
@@ -66,7 +65,6 @@ func (r *renderer) Render() (*bytes.Buffer, error) {
 		if err != nil {
 			return nil, err
 		}
-		fmt.Println(string(res))
 		err = yaml.Unmarshal([]byte(string(res)), &vals)
 		if err != nil {
 			return nil, err
