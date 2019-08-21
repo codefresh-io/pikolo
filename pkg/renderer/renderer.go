@@ -21,6 +21,9 @@ type (
 		TemplateReaders map[string]io.Reader
 		ValueReaders    map[string]io.Reader
 		RootNamespace   string
+		LeftDelim       string
+		RightDelim      string
+		Name            string
 	}
 
 	Values map[string]interface{}
@@ -28,6 +31,9 @@ type (
 	renderer struct {
 		templateReaders map[string]io.Reader
 		valueReaders    map[string]io.Reader
+		leftDelim       string
+		rightDelim      string
+		name            string
 	}
 )
 
@@ -35,6 +41,9 @@ func New(opt *Options) Renderer {
 	return &renderer{
 		templateReaders: opt.TemplateReaders,
 		valueReaders:    opt.ValueReaders,
+		leftDelim:       opt.LeftDelim,
+		rightDelim:      opt.RightDelim,
+		name:            opt.Name,
 	}
 }
 
@@ -50,6 +59,7 @@ func (r *renderer) Render() (*bytes.Buffer, error) {
 		}
 		content = append(content, string(res))
 	}
+
 	for name, reader := range r.valueReaders {
 		vals := Values{}
 		res, err := ioutil.ReadAll(reader)
@@ -65,10 +75,11 @@ func (r *renderer) Render() (*bytes.Buffer, error) {
 
 	}
 
-	tmpl := template.New("")
-	tmpl.Funcs(gomplate.Funcs(nil))
-	tmpl.Parse(strings.Join(content, "\n"))
-	err := tmpl.Execute(out, root)
+	tmpl, err := template.New(r.name).Funcs(gomplate.Funcs(nil)).Delims(r.leftDelim, r.rightDelim).Parse(strings.Join(content, "\n"))
+	if err != nil {
+		return nil, err
+	}
+	err = tmpl.Execute(out, root)
 	if err != nil {
 		return nil, err
 	}

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path"
 
 	"strings"
 
@@ -16,6 +17,8 @@ var renderCmdOptions struct {
 	templates   []string
 	values      []string
 	rootContext string
+	rightDelim  string
+	leftDelim   string
 }
 
 var renderCmd = &cobra.Command{
@@ -24,6 +27,9 @@ var renderCmd = &cobra.Command{
 		templateReaders := make(map[string]io.Reader)
 		valueReaders := make(map[string]io.Reader)
 		log := logger.New(nil)
+		if len(renderCmdOptions.templates) == 0 {
+			dieOnError(fmt.Errorf("No tempalte given"), log)
+		}
 		for _, templatePath := range renderCmdOptions.templates {
 			file, err := os.Open(templatePath)
 			dieOnError(err, log)
@@ -63,6 +69,9 @@ var renderCmd = &cobra.Command{
 		engine := renderer.New(&renderer.Options{
 			TemplateReaders: templateReaders,
 			ValueReaders:    valueReaders,
+			LeftDelim:       renderCmdOptions.leftDelim,
+			RightDelim:      renderCmdOptions.rightDelim,
+			Name:            path.Base(renderCmdOptions.templates[0]),
 		})
 		res, err := engine.Render()
 		dieOnError(err, log)
@@ -75,4 +84,6 @@ func init() {
 	renderCmd.Flags().StringArrayVar(&renderCmdOptions.templates, "template", []string{}, "Path to template file")
 	renderCmd.Flags().StringArrayVar(&renderCmdOptions.values, "value", []string{}, "Path to value file")
 	renderCmd.Flags().StringVar(&renderCmdOptions.rootContext, "root-namespace", "Values", "Name of the root namespace (default: Values)")
+	renderCmd.Flags().StringVar(&renderCmdOptions.leftDelim, "left-delim", "<<", "Left delimiter (default: <<)")
+	renderCmd.Flags().StringVar(&renderCmdOptions.rightDelim, "right-delim", ">>", "Right delimiter (default: >>)")
 }
