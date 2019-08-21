@@ -30,7 +30,7 @@ func Test_renderer_Render(t *testing.T) {
 			},
 			name:    "Render",
 			wantErr: false,
-			result:  bytes.NewBufferString("value"),
+			result:  bytes.NewBufferString("value\n"),
 		},
 	}
 

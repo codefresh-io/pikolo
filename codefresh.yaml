@@ -6,5 +6,5 @@ steps:
     git: cf_github
   test:
     image: golang
-    commnads:
+    commands:
     - make test
