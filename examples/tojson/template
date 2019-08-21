@@ -1,0 +1,7 @@
+steps:
+  step_name:
+    image: alpine:3.8
+    commands:
+    - echo {{ (.Values.JSON | json).key }}
+    - echo {{ (.Values.JSON | toJSON) }}
+    - echo {{ .Values.Key }}

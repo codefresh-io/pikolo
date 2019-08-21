@@ -1,0 +1,1 @@
+Show how to iterate over array of values
