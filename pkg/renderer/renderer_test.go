@@ -13,7 +13,7 @@ import (
 func Test_renderer_Render(t *testing.T) {
 	tests := []struct {
 		name            string
-		templateReaders []io.Reader
+		templateReaders map[string]io.Reader
 		valueReaders    map[string]io.Reader
 		wantErr         bool
 		result          *bytes.Buffer
@@ -24,7 +24,9 @@ func Test_renderer_Render(t *testing.T) {
 			result:  bytes.NewBufferString(""),
 		},
 		{
-			templateReaders: []io.Reader{strings.NewReader("{{ .Values.key }}\n")},
+			templateReaders: map[string]io.Reader{
+				"key": strings.NewReader("{{ .Values.key }}\n"),
+			},
 			valueReaders: map[string]io.Reader{
 				"Values": strings.NewReader("key: value"),
 			},

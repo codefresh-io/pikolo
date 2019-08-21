@@ -21,13 +21,13 @@ var renderCmdOptions struct {
 var renderCmd = &cobra.Command{
 	Use: "render",
 	Run: func(cmd *cobra.Command, args []string) {
-		var templateReaders []io.Reader
+		templateReaders := make(map[string]io.Reader)
 		valueReaders := make(map[string]io.Reader)
 		log := logger.New(nil)
 		for _, templatePath := range renderCmdOptions.templates {
 			file, err := os.Open(templatePath)
 			dieOnError(err, log)
-			templateReaders = append(templateReaders, file)
+			templateReaders[templatePath] = file
 			defer file.Close()
 		}
 

@@ -1,10 +1,78 @@
 version: '1.0'
+
+mode: parallel
+
+stages:
+- Build & Test
+- Push & Release
+
 steps:
   main_clone:
+    stage: Build & Test
     type: git-clone
     repo: codefresh-io/pikolo
     git: cf_github
+    revision: ${{CF_REVISION}}
+  
+  calculate_version:
+    stage: Build & Test
+    title: 'Calculate latest version'
+    image: alpine:3.8
+    commands:
+        - cf_export VERSION=$(VERSION)
+    when:
+      steps:
+      - name: main_clone
+        on:
+        - success
+
   test:
+    stage: Build & Test
     image: golang
     commands:
     - make test
+    when:
+      steps:
+      - name: main_clone
+        on:
+        - success
+  
+  create_git_tag:
+    title: Push tag to git
+    image: codefresh/cli
+    stage: Push & Release
+    commands:
+    - export OLD_ORIGIN=$(git remote get-url origin)
+    - git remote rm origin
+    - git remote add origin https://${{GITHUB_TOKEN}}@github.com/codefresh-io/pikolo.git
+    - git tag v${{VERSION}}
+    - git push --tags
+    - git remote rm origin
+    - git remote add origin $OLD_ORIGIN
+    
+    fail_fast: false
+    when:
+      steps:
+      - name: test
+        on:
+        - success
+      branch:
+        only:
+        - master
+  
+  release_binaries:
+    title: Create release in Github
+    image: goreleaser/goreleaser
+    stage: Push & Release
+    fail_fast: false
+    commands:
+    - go mod download
+    - goreleaser release -f goreleaser.yaml --rm-dist --skip-validate
+    when:
+      steps:
+      - name: create_git_tag
+        on:
+        - finished
+      branch:
+        only:
+        - master

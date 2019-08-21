@@ -18,7 +18,7 @@ type (
 	}
 
 	Options struct {
-		TemplateReaders []io.Reader
+		TemplateReaders map[string]io.Reader
 		ValueReaders    map[string]io.Reader
 		RootNamespace   string
 	}
@@ -26,7 +26,7 @@ type (
 	Values map[string]interface{}
 
 	renderer struct {
-		templateReaders []io.Reader
+		templateReaders map[string]io.Reader
 		valueReaders    map[string]io.Reader
 	}
 )
