@@ -91,7 +91,7 @@ func init() {
 	rootCmd.AddCommand(renderCmd)
 	renderCmd.Flags().StringArrayVar(&renderCmdOptions.templates, "template", []string{}, "Path to template file")
 	renderCmd.Flags().StringArrayVar(&renderCmdOptions.values, "value", []string{}, "Path to value file")
-	renderCmd.Flags().StringVar(&renderCmdOptions.rootContext, "root-namespace", "Values", "Name of the root namespace (default: Values)")
-	renderCmd.Flags().StringVar(&renderCmdOptions.leftDelim, "left-delim", "{{", "Left delimiter (default: <<)")
-	renderCmd.Flags().StringVar(&renderCmdOptions.rightDelim, "right-delim", "}}", "Right delimiter (default: >>)")
+	renderCmd.Flags().StringVar(&renderCmdOptions.rootContext, "root-namespace", "Values", "Name of the root namespace")
+	renderCmd.Flags().StringVar(&renderCmdOptions.leftDelim, "left-delim", "{{", "Left delimiter ")
+	renderCmd.Flags().StringVar(&renderCmdOptions.rightDelim, "right-delim", "}}", "Right delimiter")
 }
