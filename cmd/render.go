@@ -19,14 +19,25 @@ var renderCmdOptions struct {
 	rootContext string
 	rightDelim  string
 	leftDelim   string
+	outputFile  string
 }
 
 var renderCmd = &cobra.Command{
 	Use: "render",
 	Run: func(cmd *cobra.Command, args []string) {
+		log := logger.New(nil)
+		var writer io.Writer
+		if renderCmdOptions.outputFile == "" {
+			writer = os.Stdout
+		} else {
+			f, err := os.Create(renderCmdOptions.outputFile)
+			dieOnError(err, log)
+			defer f.Close()
+			writer = f
+		}
+
 		templateReaders := make(map[string]io.Reader)
 		valueReaders := make(map[string][]io.Reader)
-		log := logger.New(nil)
 		if len(renderCmdOptions.templates) == 0 {
 			dieOnError(fmt.Errorf("No tempalte given"), log)
 		}
@@ -83,7 +94,7 @@ var renderCmd = &cobra.Command{
 		})
 		res, err := engine.Render()
 		dieOnError(err, log)
-		fmt.Println(res.String())
+		fmt.Fprintln(writer, res.String())
 	},
 }
 
@@ -94,4 +105,5 @@ func init() {
 	renderCmd.Flags().StringVar(&renderCmdOptions.rootContext, "root-namespace", "Values", "Name of the root namespace")
 	renderCmd.Flags().StringVar(&renderCmdOptions.leftDelim, "left-delim", "{{", "Left delimiter ")
 	renderCmd.Flags().StringVar(&renderCmdOptions.rightDelim, "right-delim", "}}", "Right delimiter")
+	renderCmd.Flags().StringVar(&renderCmdOptions.outputFile, "output", "", "Write the output to file instead of stdout")
 }
