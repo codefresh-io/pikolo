@@ -36,20 +36,12 @@ func Test_main(t *testing.T) {
 			pikolo := exec.Command("/tmp/pikolo-test", test.Arguments...)
 			out, err := pikolo.Output()
 			if err != nil {
-				assert.Fail(tt, "Should not faile")
+				assert.Fail(tt, "Should not fail")
 			}
 			assert.Equal(tt, test.Output, string(out))
 		})
 	}
 
-}
-
-func init() {
-	make := exec.Command("make")
-	make.Args = []string{"build-test"}
-	err := make.Run()
-	dieOnError(err)
-	fmt.Println("Binary created")
 }
 
 func dieOnError(err error) {
