@@ -4,4 +4,4 @@ steps:
     commands:
     - echo {{ (.Values.JSON | json).key }}
     - echo {{ (.Values.JSON | toJSON) }}
-    - echo {{ .Values.Key }}
+    - echo {{ .Values.Key -}}

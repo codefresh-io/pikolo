@@ -1,5 +1,0 @@
-steps:
-{{ range .Values.images }}
-  step:
-    image: {{ . }}
-{{ end }}

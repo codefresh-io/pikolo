@@ -1,0 +1,104 @@
+- title: "print help"
+  arguments:
+  - --help
+  output: >
+    Usage:
+      pikolo [command]
+
+    Available Commands:
+      help        Help about any command
+      render      
+
+    Flags:
+      -h, --help   help for pikolo
+
+    Use "pikolo [command] --help" for more information about a command.
+
+- title: "print help out render"
+  arguments:
+  - render
+  - --help
+  output: >
+    Usage:
+      pikolo render [flags]
+
+    Flags:
+      -h, --help                    help for render
+          --left-delim string       Left delimiter  (default "{{")
+          --output string           Write the output to file instead of stdout
+          --right-delim string      Right delimiter (default "}}")
+          --root-namespace string   Name of the root namespace (default "Values")
+          --template stringArray    Path to template file
+          --value stringArray       Path to value file
+
+- title: "Basic flow"
+  arguments:
+  - render
+  - --template
+  - testdata/simple/template
+  - --value
+  - testdata/simple/values.yaml
+  output: >
+    steps:
+      step_1:
+        image: alpine:3.8
+
+- title: "Different namespace"
+  arguments:
+  - render
+  - --template
+  - testdata/with-namespace/template 
+  - --value 
+  - Context=testdata/with-namespace/values.yaml
+  output: >
+    steps:
+      step_1:
+        image: alpine:3.8
+
+- title: "Call json and toJSON functions"
+  arguments:
+  - render
+  - --template
+  - testdata/tojson/template 
+  - --value 
+  - testdata/tojson/values.yaml
+  output: >
+    steps:
+      step_name:
+        image: alpine:3.8
+        commands:
+        - echo value
+        - echo "{\n    \"key\": \"value\"\n}"
+        - echo Root
+
+- title: "Use json as input"
+  arguments:
+  - render
+  - --template
+  - testdata/json-values/template 
+  - --value 
+  - testdata/json-values/values.json
+  output: >
+    steps:
+      step_1:
+        image: alpine
+
+- title: "Input multiple template and value files"
+  arguments:
+  - render
+  - --template 
+  - testdata/multiple-files/templates/t1
+  - --template 
+  - testdata/multiple-files/templates/t2
+  - --value 
+  - testdata/multiple-files/values/values.yaml
+  - --value 
+  - testdata/multiple-files/values/values_2.json1
+  output: >
+    steps:
+      step_1:
+        image: alpine:3.8
+    steps:
+      step_1:
+        image: value
+

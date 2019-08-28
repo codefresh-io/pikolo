@@ -1,1 +1,0 @@
-Shows how to convert full object to json as string

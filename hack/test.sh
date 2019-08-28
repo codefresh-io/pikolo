@@ -3,6 +3,9 @@
 set -e
 set -o pipefail
 
+echo "Building test binary"
+sh ./hack/build-test.sh
+
 rm -rf .cover/ .test/
 mkdir .cover/ .test/
 trap "rm -rf .test/" EXIT
@@ -18,3 +21,6 @@ go tool cover -html=.cover/cover.out -o=.cover/coverage.html
 
 CODECOV_BASH_URL=https://codecov.io/bash
 if [ "$CODECOV_TOKEN" != "" ]; then curl -s $CODECOV_BASH_URL | bash -s; fi
+
+echo "Cleaning assests"
+rm /tmp/pikolo-test

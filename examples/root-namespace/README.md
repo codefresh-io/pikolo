@@ -1,1 +1,0 @@
-Show how to overwrite the root namespace with custom one
