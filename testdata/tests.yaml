@@ -93,7 +93,7 @@
   - --value 
   - testdata/multiple-files/values/values.yaml
   - --value 
-  - testdata/multiple-files/values/values_2.json1
+  - testdata/multiple-files/values/values_2.json
   output: >
     steps:
       step_1:
