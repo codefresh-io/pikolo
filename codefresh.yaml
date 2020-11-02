@@ -11,7 +11,7 @@ steps:
     stage: Build & Test
     type: git-clone
     repo: ${{CF_REPO_OWNER}}/${{CF_REPO_NAME}}
-    git: github
+    git: cf_github
     revision: ${{CF_REVISION}}
   
   calculate_version:
@@ -92,9 +92,23 @@ steps:
         on:
         - success
 
+  push_cli_image_quay:
+    title: "Push image to Quay"
+    stage: Push & Release
+    type: push
+    candidate: ${{build}}
+    tags:
+    - latest
+    - ${{VERSION}}
+    registry: ${{REGISTRY_INTEGRATION_QUAY}}
+    when:
+      steps:
+        - name: build
+          on:
+          - success
 
-  push_cli_image:
-    title: "Push image"
+  push_cli_image_dockerub:
+    title: "Push image to Dockerhub"
     stage: Push & Release
     type: push
     candidate: ${{build}}
