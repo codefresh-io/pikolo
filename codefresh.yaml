@@ -10,7 +10,7 @@ steps:
   main_clone:
     stage: Build & Test
     type: git-clone
-    repo: codefresh-io/pikolo
+    repo: ${{CF_REPO_OWNER}}/${{CF_REPO_NAME}}
     git: cf_github
     revision: ${{CF_REVISION}}
   
@@ -39,12 +39,14 @@ steps:
   
   create_git_tag:
     title: Push tag to git
-    image: codefresh/cli
+    image: codefreshio/ci-helpers
     stage: Push & Release
     commands:
+    - source /get-token/get-gh-token.sh
+    - cf_export GITHUB_TOKEN
     - export OLD_ORIGIN=$(git remote get-url origin)
     - git remote rm origin
-    - git remote add origin https://${{GITHUB_TOKEN}}@github.com/codefresh-io/pikolo.git
+    - git remote add origin https://${GITHUB_TOKEN}@github.com/${{CF_REPO_OWNER}}/${{CF_REPO_NAME}}.git
     - git tag v${{VERSION}}
     - git push --tags
     - git remote rm origin
@@ -90,9 +92,23 @@ steps:
         on:
         - success
 
+  push_cli_image_quay:
+    title: "Push image to Quay"
+    stage: Push & Release
+    type: push
+    candidate: ${{build}}
+    tags:
+    - latest
+    - ${{VERSION}}
+    registry: ${{REGISTRY_INTEGRATION_QUAY}}
+    when:
+      steps:
+        - name: build
+          on:
+          - success
 
-  push_cli_image:
-    title: "Push image"
+  push_cli_image_dockerub:
+    title: "Push image to Dockerhub"
     stage: Push & Release
     type: push
     candidate: ${{build}}
