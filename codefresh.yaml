@@ -11,9 +11,9 @@ steps:
     stage: Build & Test
     type: git-clone
     repo: ${{CF_REPO_OWNER}}/${{CF_REPO_NAME}}
-    git: cf_github
+    git: ${{GIT_CONTEXT}}
     revision: ${{CF_REVISION}}
-  
+
   calculate_version:
     stage: Build & Test
     title: 'Calculate latest version'
@@ -36,7 +36,7 @@ steps:
       - name: main_clone
         on:
         - success
-  
+
   create_git_tag:
     title: Push tag to git
     image: codefreshio/ci-helpers
@@ -51,7 +51,7 @@ steps:
     - git push --tags
     - git remote rm origin
     - git remote add origin $OLD_ORIGIN
-    
+
     fail_fast: false
     when:
       steps:
@@ -61,7 +61,7 @@ steps:
       branch:
         only:
         - master
-  
+
   release_binaries:
     title: Create release in Github
     image: goreleaser/goreleaser
@@ -79,45 +79,50 @@ steps:
         only:
         - master
 
-        
   build:
-    title: "Building production image"
-    type: build
-    stage: Build & Test
-    tag: ${{VERSION}}
-    image_name: codefresh/pikolo
+    stage: build
+    type: "alexcodefresh/test-docker" 
+    retry:
+      maxAttempts: 3
+      delay: 5
+      exponentialFactor: 2
+    arguments:
+      image_name: ${{IMAGE_NAME}}
+      working_directory: '${{CF_VOLUME_PATH}}/${{CF_REPO_NAME}}'
+      dockerfile: './Dockerfile'
+      platforms: 
+        - linux/amd64
+        - linux/arm64
+      registries:
+        - name: 'quay.io'
+          username: '${{QUAY_USERNAME}}'
+          password: '${{QUAY_PASSWORD}}'
+        - name: 'docker.io'
+          username: '${{DOCKERHUB_USERNAME}}'
+          password: '${{DOCKERHUB_PASSWORD}}'
+        - name: 'gcr.io'
+          path_prefix: codefresh-enterprise
+          username: '${{GCR_USERNAME}}'
+          password: '${{GCR_PASSWORD}}'
     when:
       steps:
-      - name: release_binaries
-        on:
-        - success
-
-  push_cli_image_quay:
-    title: "Push image to Quay"
-    stage: Push & Release
-    type: push
-    candidate: ${{build}}
-    tags:
-    - latest
-    - ${{VERSION}}
-    registry: ${{REGISTRY_INTEGRATION_QUAY}}
-    when:
-      steps:
-        - name: build
+        - name: test
           on:
           - success
-
-  push_cli_image_dockerub:
-    title: "Push image to Dockerhub"
-    stage: Push & Release
-    type: push
-    candidate: ${{build}}
-    tags:
-    - latest
-    - ${{VERSION}}
-    registry: "dockerhub"
-    when:
-      steps:
-        - name: build
-          on:
-          - success
+    scale:
+      master_branch_tags:
+        when:
+          branch:
+            only: [ master ]
+        arguments:
+          tags:
+            - ${{CF_BRANCH_TAG_NORMALIZED}}
+            - ${{VERSION}}
+            - latest
+      dev_branches_tags:
+        when:
+          branch:
+            ignore: [master]
+        arguments:
+          tags:
+            - ${{CF_BRANCH_TAG_NORMALIZED}}
