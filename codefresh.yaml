@@ -4,16 +4,17 @@ mode: parallel
 
 stages:
 - Build & Test
-- Push & Release
+- Push
+- Github Release
 
 steps:
   main_clone:
     stage: Build & Test
     type: git-clone
-    repo: codefresh-io/pikolo
-    git: cf_github
+    repo: ${{CF_REPO_OWNER}}/${{CF_REPO_NAME}}
+    git: ${{GIT_CONTEXT}}
     revision: ${{CF_REVISION}}
-  
+
   calculate_version:
     stage: Build & Test
     title: 'Calculate latest version'
@@ -36,20 +37,148 @@ steps:
       - name: main_clone
         on:
         - success
-  
+
+  build:
+    title: "Building image"
+    type: build
+    stage: Build & Test
+    disable_push: true
+    tag: ${{CF_BRANCH_TAG_NORMALIZED}}
+    image_name: ${{IMAGE_NAME}}
+    when:
+      steps:
+      - name: main_clone
+        on:
+        - success
+
+  run_arm_build:
+    type: codefresh-run
+    stage: Build & Test
+    when:
+      steps:
+      - name: calculate_version
+        on:
+        - success
+    arguments:
+      PIPELINE_ID: ${{ARM_PIPELINE_ID}}
+      DETACH: false
+      VARIABLE:
+        - CF_REPO_OWNER=${{CF_REPO_OWNER}}
+        - CF_REPO_NAME=${{CF_REPO_NAME}}
+        - CF_REVISION=${{CF_REVISION}}
+        - CF_BRANCH=${{CF_BRANCH}}
+        - CF_BRANCH_TAG_NORMALIZED=${{CF_BRANCH_TAG_NORMALIZED}}
+        - GIT_CONTEXT=${{GIT_CONTEXT}}
+        - IMAGE_NAME=${{IMAGE_NAME}}
+        - VERSION=${{VERSION}}
+        - ARM_TAG_POSTFIX="${{ARM_TAG_POSTFIX}}"
+
+  push_dev_image:
+    title: "Pushing dev version of the image"
+    type: push
+    stage: Push
+    candidate: ${{build}}
+    tag: ${{CF_BRANCH_TAG_NORMALIZED}}
+    when:
+      steps:
+        - name: build
+          on:
+          - success
+    scale:
+      push_quay_dev:
+        registry: "${{REGISTRY_INTEGRATION_QUAY}}"
+      push_dockerhub_dev:
+        registry: "${{REGISTRY_INTEGRATION_DOCKERHUB}}"
+      push_gcr_enterprise_dev:
+        registry: "${{REGISTRY_INTEGRATION_ENTERPRISE}}"
+
+  push_prod_image:
+    title: "Pushing prod version of the image"
+    type: push
+    stage: Push
+    candidate: ${{build}}
+    tags: 
+      - ${{VERSION}}
+      - 'latest'
+    when:
+      steps:
+        - name: build
+          on:
+          - success
+      branch:
+        only: [ master ]
+    scale:
+      push_quay_prod:
+        registry: "${{REGISTRY_INTEGRATION_QUAY}}"
+      push_dockerhub_prod:
+        registry: "${{REGISTRY_INTEGRATION_DOCKERHUB}}"
+      push_gcr_enterprise_prod:
+        registry: "${{REGISTRY_INTEGRATION_ENTERPRISE}}"
+
+  create_manifest_list:
+    stage: Push
+    type: "codefresh-inc/multiarch-manifester"
+    when:
+      steps:
+        - name:  run_arm_build
+          on:
+          - success
+    arguments:
+      image_name: ${{IMAGE_NAME}}
+      arch_tag_postfixes: 
+        arm64: "${{ARM_TAG_POSTFIX}}"
+      registries:
+        - name: 'quay.io'
+          username: '${{QUAY_USERNAME}}'
+          password: '${{QUAY_PASSWORD}}'
+        - name: 'docker.io'
+          username: '${{DOCKERHUB_USERNAME}}'
+          password: '${{DOCKERHUB_PASSWORD}}'
+        - name: 'gcr.io'
+          path_prefix: codefresh-enterprise
+          username: '${{GCR_USERNAME}}'
+          password: '${{GCR_PASSWORD}}'
+    scale:
+      master_branch_tags:
+        when:
+          branch:
+            only: [ master ]
+          steps:
+            - name: push_prod_image
+              on:
+              - success
+        arguments:
+          tags:
+            - ${{CF_BRANCH_TAG_NORMALIZED}}
+            - ${{VERSION}}
+            - latest
+      dev_branches_tags:
+        when:
+          branch:
+            ignore: [ master ]
+          steps:
+            - name: push_dev_image
+              on:
+              - success
+        arguments:
+          tags:
+            - ${{CF_BRANCH_TAG_NORMALIZED}}
+
   create_git_tag:
     title: Push tag to git
-    image: codefresh/cli
-    stage: Push & Release
+    image: codefreshio/ci-helpers
+    stage: Github Release
     commands:
+    - source /get-token/get-gh-token.sh
+    - cf_export GITHUB_TOKEN
     - export OLD_ORIGIN=$(git remote get-url origin)
     - git remote rm origin
-    - git remote add origin https://${{GITHUB_TOKEN}}@github.com/codefresh-io/pikolo.git
+    - git remote add origin https://${GITHUB_TOKEN}@github.com/${{CF_REPO_OWNER}}/${{CF_REPO_NAME}}.git
     - git tag v${{VERSION}}
     - git push --tags
     - git remote rm origin
     - git remote add origin $OLD_ORIGIN
-    
+
     fail_fast: false
     when:
       steps:
@@ -59,11 +188,11 @@ steps:
       branch:
         only:
         - master
-  
+
   release_binaries:
     title: Create release in Github
     image: goreleaser/goreleaser
-    stage: Push & Release
+    stage: Github Release
     fail_fast: false
     commands:
     - go mod download
