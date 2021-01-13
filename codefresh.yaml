@@ -221,7 +221,7 @@ steps:
 
   push_cli_image:
     title: "Push image"
-    stage: Push & Release
+    stage: Push
     type: push
     candidate: ${{build}}
     tags:
