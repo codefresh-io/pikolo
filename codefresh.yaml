@@ -204,20 +204,4 @@ steps:
         - finished
       branch:
         only:
-        - master
-
-        
-  push_cli_image:
-    title: "Push image"
-    stage: Push
-    type: push
-    candidate: ${{build}}
-    tags:
-    - latest
-    - ${{VERSION}}
-    registry: "dockerhub"
-    when:
-      steps:
-        - name: build
-          on:
-          - success
+        - master   
