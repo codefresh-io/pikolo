@@ -207,24 +207,12 @@ steps:
         - master
 
         
-  build:
-    title: "Building production image"
-    type: build
-    stage: Build & Test
-    tag: ${{VERSION}}
-    image_name: codefresh/pikolo
-    when:
-      steps:
-      - name: release_binaries
-        on:
-        - success
-
   scan:
     title: "Scan image for vulnarabilities"
     image: snyk/snyk-cli:npm
     stage: Build & Test
     commands:
-      - snyk container test --docker codefresh/pikolo:${{VERSION}} --file=Dockerfile
+      - snyk container test --docker ${{IMAGE_NAME}}:${{VERSION}} --file=Dockerfile
     when:
       steps:
       - name: build
