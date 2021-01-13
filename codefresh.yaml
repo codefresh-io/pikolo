@@ -215,7 +215,7 @@ steps:
       - snyk container test --docker ${{IMAGE_NAME}}:${{VERSION}} --file=Dockerfile
     when:
       steps:
-      - name: Building image
+      - name: build
         on:
         - success
 
