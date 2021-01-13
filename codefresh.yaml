@@ -90,6 +90,17 @@ steps:
         on:
         - success
 
+  scan:
+    title: "Scan image for vulnarabilities"
+    image: snyk/snyk-cli:npm
+    stage: Build & Test
+    commands:
+      - snyk container test --docker codefresh/pikolo:${{VERSION}} --file=Dockerfile
+    when:
+      steps:
+      - name: build
+        on:
+        - success
 
   push_cli_image:
     title: "Push image"
