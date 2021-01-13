@@ -207,18 +207,6 @@ steps:
         - master
 
         
-  scan:
-    title: "Scan image for vulnarabilities"
-    image: snyk/snyk-cli:npm
-    stage: Build & Test
-    commands:
-      - snyk container test --docker ${{IMAGE_NAME}}:${{VERSION}} --file=Dockerfile
-    when:
-      steps:
-      - name: build
-        on:
-        - success
-
   push_cli_image:
     title: "Push image"
     stage: Push
