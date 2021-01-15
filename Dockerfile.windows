@@ -1,0 +1,19 @@
+ARG WIN_RELEASE=1809
+
+FROM golang:windowsservercore-$WIN_RELEASE AS builder
+
+WORKDIR $GOPATH/src/github.com/pikolo
+ENV GO111MODULE=on
+ENV CGO_ENABLED=0
+
+COPY . .
+
+RUN go build
+
+FROM mcr.microsoft.com/windows/nanoserver:$WIN_RELEASE
+COPY --from=builder C:/gopath/src/github.com/pikolo/pikolo.exe %windir%/system32/
+
+LABEL io.codefresh.engine="true"
+
+ENTRYPOINT ["%windir%/system32/pikolo"]
+CMD [ "--help" ]
