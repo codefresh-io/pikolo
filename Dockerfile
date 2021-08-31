@@ -10,7 +10,7 @@ RUN go mod download
 COPY . .
 RUN env CGO_ENABLED=0 go build -ldflags="-s -w"
 
-FROM alpine:latest
+FROM alpine:3.14
 
 RUN apk add --update ca-certificates
 
