@@ -50,3 +50,4 @@ func dieOnError(err error) {
 		os.Exit(1)
 	}
 }
+// test
