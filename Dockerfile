@@ -1,4 +1,4 @@
-FROM golang:1.11.11-alpine3.8 as build
+FROM golang:1.17.8-alpine3.15 as build
 
 WORKDIR /pikolo
 
@@ -10,7 +10,7 @@ RUN go mod download
 COPY . .
 RUN env CGO_ENABLED=0 go build -ldflags="-s -w"
 
-FROM alpine:3.14
+FROM alpine:3.15
 
 RUN apk add --update ca-certificates
 
