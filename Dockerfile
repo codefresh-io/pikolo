@@ -1,4 +1,4 @@
-FROM golang:1.11.12-alpine3.10 as build
+FROM golang:1.17.8-alpine3.15 as build
 
 WORKDIR /pikolo
 
