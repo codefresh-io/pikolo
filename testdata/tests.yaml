@@ -41,7 +41,7 @@
   output: >
     steps:
       step_1:
-        image: alpine:3.8
+        image: alpine:3.15
 
 - title: "Different namespace"
   arguments:
@@ -53,7 +53,7 @@
   output: >
     steps:
       step_1:
-        image: alpine:3.8
+        image: alpine:3.15
 
 - title: "Call json and toJSON functions"
   arguments:
@@ -65,7 +65,7 @@
   output: >
     steps:
       step_name:
-        image: alpine:3.8
+        image: alpine:3.15
         commands:
         - echo value
         - echo "{\n    \"key\": \"value\"\n}"
@@ -97,7 +97,7 @@
   output: >
     steps:
       step_1:
-        image: alpine:3.8
+        image: alpine:3.15
     steps:
       step_1:
         image: value

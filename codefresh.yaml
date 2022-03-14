@@ -18,7 +18,7 @@ steps:
   calculate_version:
     stage: Build & Test
     title: 'Calculate latest version'
-    image: alpine:3.8
+    image: alpine:3.15
     commands:
         - cf_export VERSION=$(cat VERSION)
     when:
