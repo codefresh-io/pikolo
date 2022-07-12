@@ -19,5 +19,9 @@ COPY VERSION /VERSION
 
 LABEL io.codefresh.engine="true"
 
+RUN adduser -D -h /home/cfu -s /bin/bash cfu
+
+USER cfu
+
 ENTRYPOINT ["pikolo"]
 CMD [ "--help" ]
