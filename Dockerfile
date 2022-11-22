@@ -14,7 +14,8 @@ RUN env CGO_ENABLED=0 go build -ldflags="-s -w"
 FROM debian:bullseye-slim
 
 RUN apt-get update -y \
-    && apt-get install -y ca-certificates
+    && apt-get install -y ca-certificates busybox \
+    && ln -s /bin/busybox /usr/bin/[[
 
 COPY --from=build /pikolo/pikolo /usr/local/bin
 COPY VERSION /VERSION
