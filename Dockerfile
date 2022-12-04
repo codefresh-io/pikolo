@@ -1,8 +1,9 @@
-FROM golang:1.17.8-alpine3.15 as build
+FROM golang:1.17.8-bullseye as build
 
 WORKDIR /pikolo
 
-RUN apk add git gcc g++
+RUN apt-get update -y \
+    && apt-get install -y git gcc g++
 
 COPY go.mod .
 RUN go mod download
@@ -10,16 +11,18 @@ RUN go mod download
 COPY . .
 RUN env CGO_ENABLED=0 go build -ldflags="-s -w"
 
-FROM alpine:3.16
+FROM debian:bullseye-slim
 
-RUN apk add --update ca-certificates
+RUN apt-get update -y \
+    && apt-get install -y ca-certificates busybox \
+    && ln -s /bin/busybox /usr/bin/[[
 
 COPY --from=build /pikolo/pikolo /usr/local/bin
 COPY VERSION /VERSION
 
 LABEL io.codefresh.engine="true"
 
-RUN adduser -D -h /home/cfu -s /bin/bash cfu
+RUN adduser --gecos "" --disabled-password --home /home/cfu --shell /bin/bash cfu
 
 USER cfu
 
