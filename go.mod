@@ -57,13 +57,13 @@ require (
 	github.com/ugorji/go/codec v0.0.0-20181204163529-d75b2dcb6bc8 // indirect
 	github.com/zealic/xignore v0.3.3 // indirect
 	golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2 // indirect
-	golang.org/x/net v0.0.0-20190620200207-3b0461eec859 // indirect
-	golang.org/x/sys v0.0.0-20190813064441-fde4db37ae7a // indirect
-	golang.org/x/text v0.3.1-0.20181227161524-e6919f6577db // indirect
+	golang.org/x/net v0.0.0-20220906165146-f3363e06e74c // indirect
+	golang.org/x/sys v0.0.0-20220728004956-3c1f35247d10 // indirect
+	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20190308202827-9d24e82272b4 // indirect
 	gopkg.in/hairyhenderson/yaml.v2 v2.0.0-00010101000000-000000000000 // indirect
 	gopkg.in/square/go-jose.v2 v2.3.1 // indirect
-	gopkg.in/yaml.v2 v2.2.2 // indirect
+	gopkg.in/yaml.v2 v2.2.4 // indirect
 	gotest.tools v2.2.0+incompatible // indirect
 	k8s.io/client-go v11.0.0+incompatible // indirect
 )
