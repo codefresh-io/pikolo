@@ -11,7 +11,7 @@ RUN go mod download
 COPY . .
 RUN env CGO_ENABLED=0 go build -ldflags="-s -w"
 
-FROM debian:bullseye-slim
+FROM debian:11.6-slim
 
 RUN apt-get update -y \
     && apt-get install -y ca-certificates busybox \
