@@ -1,4 +1,4 @@
-FROM golang:1.17.8-bullseye as build
+FROM golang:1.19.9-bullseye as build
 
 WORKDIR /pikolo
 
@@ -11,7 +11,7 @@ RUN go mod download
 COPY . .
 RUN env CGO_ENABLED=0 go build -ldflags="-s -w"
 
-FROM debian:bullseye-slim
+FROM debian:bullseye-20230502-slim
 
 RUN apt-get update -y \
     && apt-get install -y ca-certificates busybox \

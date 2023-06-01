@@ -1,6 +1,6 @@
 module github.com/codefresh-io/pikolo
 
-go 1.17
+go 1.19
 
 require (
 	github.com/ghodss/yaml v1.0.0
@@ -56,10 +56,10 @@ require (
 	github.com/spf13/pflag v1.0.3 // indirect
 	github.com/ugorji/go/codec v0.0.0-20181204163529-d75b2dcb6bc8 // indirect
 	github.com/zealic/xignore v0.3.3 // indirect
-	golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2 // indirect
+	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
 	golang.org/x/net v0.0.0-20220906165146-f3363e06e74c // indirect
-	golang.org/x/sys v0.0.0-20220728004956-3c1f35247d10 // indirect
-	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/sys v0.5.0 // indirect
+	golang.org/x/text v0.7.0 // indirect
 	golang.org/x/time v0.0.0-20190308202827-9d24e82272b4 // indirect
 	gopkg.in/hairyhenderson/yaml.v2 v2.0.0-00010101000000-000000000000 // indirect
 	gopkg.in/square/go-jose.v2 v2.3.1 // indirect
@@ -69,3 +69,5 @@ require (
 )
 
 replace gopkg.in/hairyhenderson/yaml.v2 => github.com/maxaudron/yaml v0.0.0-20190411130442-27c13492fe3c
+
+replace golang.org/x/net => golang.org/x/net v0.7.0

@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"testing"
@@ -24,7 +23,7 @@ type (
 func Test_main(t *testing.T) {
 
 	table := Tests{}
-	tests, err := ioutil.ReadFile("./testdata/tests.yaml")
+	tests, err := os.ReadFile("./testdata/tests.yaml")
 	dieOnError(err)
 	err = yaml.Unmarshal(tests, &table)
 	dieOnError(err)

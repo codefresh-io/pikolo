@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"os"
 
 	"github.com/codefresh-io/pikolo/pkg/logger"
@@ -23,7 +22,7 @@ func dieOnError(err error, logger logger.Logger) {
 }
 
 func jsonToYaml(j io.Reader) (io.Reader, error) {
-	buf, err := ioutil.ReadAll(j)
+	buf, err := io.ReadAll(j)
 	if err != nil {
 		return nil, err
 	}
