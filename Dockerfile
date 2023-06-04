@@ -11,11 +11,17 @@ RUN go mod download
 COPY . .
 RUN env CGO_ENABLED=0 go build -ldflags="-s -w"
 
-FROM debian:bullseye-20230502-slim
+FROM debian:bullseye-20230522-slim
 
-RUN apt-get update -y \
-    && apt-get install -y ca-certificates busybox \
+# Update package lists and upgrade existing packages
+RUN apt-get update && apt-get upgrade -y
+
+# Install packages required for the base image
+RUN apt-get install -y ca-certificates busybox \
     && ln -s /bin/busybox /usr/bin/[[
+
+# Clean up the package cache to reduce image size
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY --from=build /pikolo/pikolo /usr/local/bin
 COPY VERSION /VERSION

@@ -7,7 +7,7 @@ import (
 	"text/template"
 
 	"github.com/ghodss/yaml"
-	"github.com/hairyhenderson/gomplate"
+	gomplate "github.com/hairyhenderson/gomplate/v3"
 	"github.com/imdario/mergo"
 )
 
