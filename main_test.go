@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"testing"
@@ -24,7 +23,7 @@ type (
 func Test_main(t *testing.T) {
 
 	table := Tests{}
-	tests, err := ioutil.ReadFile("./testdata/tests.yaml")
+	tests, err := os.ReadFile("./testdata/tests.yaml")
 	dieOnError(err)
 	err = yaml.Unmarshal(tests, &table)
 	dieOnError(err)
@@ -32,7 +31,7 @@ func Test_main(t *testing.T) {
 	for _, test := range table {
 		fmt.Println(test.Title)
 		t.Run(test.Title, func(tt *testing.T) {
-			fmt.Println("Runnig test")
+			fmt.Println("Running test")
 			pikolo := exec.Command("/tmp/pikolo-test", test.Arguments...)
 			out, err := pikolo.Output()
 			if err != nil {

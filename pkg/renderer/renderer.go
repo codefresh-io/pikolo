@@ -3,12 +3,11 @@ package renderer
 import (
 	"bytes"
 	"io"
-	"io/ioutil"
 	"strings"
 	"text/template"
 
 	"github.com/ghodss/yaml"
-	"github.com/hairyhenderson/gomplate"
+	gomplate "github.com/hairyhenderson/gomplate/v3"
 	"github.com/imdario/mergo"
 )
 
@@ -53,7 +52,7 @@ func (r *renderer) Render() (*bytes.Buffer, error) {
 	root := Values{}
 
 	for _, reader := range r.templateReaders {
-		res, err := ioutil.ReadAll(reader)
+		res, err := io.ReadAll(reader)
 		if err != nil {
 			return nil, err
 		}
@@ -64,7 +63,7 @@ func (r *renderer) Render() (*bytes.Buffer, error) {
 		vals := Values{}
 		for _, reader := range readers {
 			v := Values{}
-			res, err := ioutil.ReadAll(reader)
+			res, err := io.ReadAll(reader)
 			if err != nil {
 				return nil, err
 			}
