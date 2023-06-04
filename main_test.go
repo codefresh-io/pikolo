@@ -31,7 +31,7 @@ func Test_main(t *testing.T) {
 	for _, test := range table {
 		fmt.Println(test.Title)
 		t.Run(test.Title, func(tt *testing.T) {
-			fmt.Println("Runnig test")
+			fmt.Println("Running test")
 			pikolo := exec.Command("/tmp/pikolo-test", test.Arguments...)
 			out, err := pikolo.Output()
 			if err != nil {
