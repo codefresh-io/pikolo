@@ -1,4 +1,4 @@
-FROM golang:1.19.9-bullseye as build
+FROM golang:1.20.10-bullseye as build
 
 WORKDIR /pikolo
 
@@ -11,7 +11,7 @@ RUN go mod download
 COPY . .
 RUN env CGO_ENABLED=0 go build -ldflags="-s -w"
 
-FROM debian:bullseye-20230522-slim
+FROM debian:bullseye-20231009-slim
 
 # Update package lists and upgrade existing packages
 RUN apt-get update && apt-get upgrade -y
