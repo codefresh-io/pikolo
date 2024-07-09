@@ -11,7 +11,7 @@ RUN go mod download
 COPY . .
 RUN env CGO_ENABLED=0 go build -ldflags="-s -w"
 
-FROM debian:bookworm-slim
+FROM debian:bookworm-20240701-slim
 
 # Update package lists and upgrade existing packages
 RUN apt-get update && apt-get upgrade -y
