@@ -2,13 +2,12 @@ package renderer
 
 import (
 	"bytes"
+	"github.com/ghodss/yaml"
+	gomplate "github.com/hairyhenderson/gomplate/v4"
+	"github.com/imdario/mergo"
 	"io"
 	"strings"
 	"text/template"
-
-	"github.com/ghodss/yaml"
-	gomplate "github.com/hairyhenderson/gomplate/v3"
-	"github.com/imdario/mergo"
 )
 
 type (
@@ -77,7 +76,7 @@ func (r *renderer) Render() (*bytes.Buffer, error) {
 
 	}
 
-	tmpl, err := template.New(r.name).Funcs(gomplate.Funcs(nil)).Delims(r.leftDelim, r.rightDelim).Parse(strings.Join(content, "\n"))
+	tmpl, err := template.New(r.name).Funcs(gomplate.CreateFuncs(nil)).Delims(r.leftDelim, r.rightDelim).Parse(strings.Join(content, "\n"))
 	if err != nil {
 		return nil, err
 	}
