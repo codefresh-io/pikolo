@@ -1,5 +1,4 @@
 FROM golang:1.24-bookworm AS build
-
 WORKDIR /pikolo
 
 RUN apt-get update -y \
@@ -11,26 +10,12 @@ RUN go mod download
 COPY . .
 RUN env CGO_ENABLED=0 go build -ldflags="-s -w"
 
-FROM debian:bookworm-20241223-slim
-
-# Update package lists and upgrade existing packages
-RUN apt-get update && apt-get upgrade -y
-
-# Install packages required for the base image
-RUN apt-get install -y ca-certificates busybox \
-    && ln -s /bin/busybox /usr/bin/[[
-
-# Clean up the package cache to reduce image size
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
-
-COPY --from=build /pikolo/pikolo /usr/local/bin
-COPY VERSION /VERSION
-
-LABEL io.codefresh.engine="true"
-
+FROM debian:bookworm-20250407-slim
 RUN adduser --gecos "" --disabled-password --home /home/cfu --shell /bin/bash cfu
-
 USER cfu
+
+COPY --from=build --chown=cfu:cfu /pikolo/pikolo /usr/local/bin
+COPY --chown=cfu:cfu VERSION /VERSION
 
 ENTRYPOINT ["pikolo"]
 CMD [ "--help" ]
